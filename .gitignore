@@ -37,3 +37,4 @@ next-env.d.ts
 
 #for jupyter
 .ipynb_checkpoints/
+**/__pycache__/
