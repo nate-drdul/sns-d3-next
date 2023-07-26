@@ -8,8 +8,7 @@ import seaborn as sns
 
 import json
 
-import datetime as dt
-from dateutil.relativedelta import relativedelta
+from datetime import datetime, timedelta
 
 #########################################################################################################
 
@@ -60,12 +59,61 @@ async def get_test_data():
 
 
 #########################################################################################################
-# Returns a list as json of the example dataset sets in seaborn
-#### http://127.0.0.1:8000//List_SNS_Data
+# Returns a list as json of the example datasets in seaborn
+#### http://127.0.0.1:8000/listData
 
-@app.get("/listSNSData")
-async def listSNSData():
+@app.get("/listData")
+async def listData():
     return {"data": sns.get_dataset_names()}
+
+#########################################################################################################
+#### http://127.0.0.1:8000/randomTimeData
+
+@app.get("/randomTimeData")
+async def randomTimeData():
+
+    # Variables for the range of random values
+    x = 0
+    y = 100
+
+    now = datetime.now()
+    dates = pd.date_range(start=now, periods=31)
+    df = pd.DataFrame(index=dates, data={'value': np.random.randint(x, y, size=len(dates))})
+
+    #remove the time stamp so just dates
+    df.index = df.index.date
+
+    #reset the index to get the dates in their own column
+    df.reset_index(inplace=True)
+    df.rename(columns = {'index':'date'}, inplace = True)
+
+    return {"data": df.to_dict(orient="records")}
+
+#########################################################################################################
+#### http://127.0.0.1:8000/randomWalk
+
+@app.get("/randomWalk")
+async def randomwalk():
+
+   # Variables for the range of random values
+    x = -100
+    y = 100
+
+    now = datetime.now()
+    dates = pd.date_range(start=now, periods=31)
+    df = pd.DataFrame(index=dates, data={'value': np.random.randint(x, y, size=len(dates))})
+
+    # Create a cumulative sum of 'value' column
+    df['value'] = df['value'].cumsum()
+
+    #remove the time stamp so just dates
+    df.index = df.index.date
+
+    #reset the index to get the dates in their own column
+    df.reset_index(inplace=True)
+    df.rename(columns = {'index':'date'}, inplace = True)
+
+    return {"data": df.to_dict(orient="records")}
 
 
 
